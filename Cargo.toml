@@ -1,0 +1,23 @@
+[package]
+name = "md-editer"
+version = "0.1.0"
+edition = "2024"
+authors = ["Your Name <your.email@example.com>"]
+description = "A Markdown editor using Rust and WebAssembly"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+pulldown-cmark = "0.9"  # Markdownパーサー
+console_error_panic_hook = "0.1"  # エラーハンドリング用
+js-sys = "0.3"
+web-sys = { version = "0.3", features = [
+    "Document",
+    "Element",
+    "HtmlElement",
+    "Node",
+    "Window",
+] }
+regex = "1.10"  # 正規表現ライブラリ

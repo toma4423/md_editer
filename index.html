@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor</title>
+    <!-- MathJaxのスクリプト -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: true,
+                processEnvironments: true,
+                packages: {
+                    '[+]': ['base', 'ams', 'noerrors', 'noundefined']
+                }
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    console.log('MathJax is ready');
+                }
+            },
+            chtml: {
+                scale: 1.1,
+                minScale: 0.5
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        :root {
+            --editor-bg: #f8f9fa;
+            --preview-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dee2e6;
+            --focus-color: #80bdff;
+            --math-color: #2b5797;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 20px;
+        }
+        
+        .cheatsheet-section {
+            background-color: var(--preview-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .editor, .preview {
+            background-color: var(--preview-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 500px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .editor {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+        }
+        
+        .editor:focus {
+            border-color: var(--focus-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .preview {
+            overflow-y: auto;
+        }
+        
+        .preview h1 {
+            font-size: 2em;
+            margin-bottom: 0.5em;
+            padding-bottom: 0.3em;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .preview h2 {
+            font-size: 1.5em;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+            padding-bottom: 0.3em;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .preview p {
+            margin-bottom: 1em;
+        }
+        
+        .preview ul, .preview ol {
+            margin-bottom: 1em;
+            padding-left: 2em;
+        }
+        
+        .preview li {
+            margin-bottom: 0.5em;
+        }
+        
+        .preview code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f8f9fa;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+        }
+        
+        .preview pre {
+            background-color: #f8f9fa;
+            padding: 1em;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 1em;
+        }
+        
+        .preview blockquote {
+            border-left: 4px solid var(--border-color);
+            padding-left: 1em;
+            margin-left: 0;
+            color: #6c757d;
+        }
+        
+        .preview table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1em;
+        }
+        
+        .preview th, .preview td {
+            border: 1px solid var(--border-color);
+            padding: 0.5em;
+        }
+        
+        .preview th {
+            background-color: #f8f9fa;
+        }
+        
+        .math-inline {
+            color: var(--math-color);
+        }
+        
+        .math-block {
+            color: var(--math-color);
+            margin: 1em 0;
+            text-align: center;
+        }
+        
+        .cheatsheet {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .cheatsheet h3 {
+            margin-top: 0;
+            color: var(--math-color);
+        }
+        
+        .cheatsheet code {
+            background-color: #e9ecef;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cheatsheet-section">
+            <h2>Markdownチートシート</h2>
+            <div class="cheatsheet">
+                <h3>見出し</h3>
+                <code># 見出し1</code><br>
+                <code>## 見出し2</code><br>
+                <code>### 見出し3</code>
+                
+                <h3>テキスト</h3>
+                <code>**太字**</code><br>
+                <code>*イタリック*</code><br>
+                <code>~~取り消し線~~</code>
+                
+                <h3>リスト</h3>
+                <code>- リスト1</code><br>
+                <code>- リスト2</code><br>
+                <code>1. 番号付きリスト1</code><br>
+                <code>2. 番号付きリスト2</code>
+                
+                <h3>数式</h3>
+                <code>$E = mc^2$</code> (インライン)<br>
+                <code>$$\frac{n!}{k!(n-k)!} = \binom{n}{k}$$</code> (ブロック)
+            </div>
+        </div>
+        
+        <div class="editor-container">
+            <textarea id="editor" class="editor" placeholder="Markdownを入力してください..."># これは見出し
+
+## ホタテの名前をつけよう
+**ホタテ**についてご存知ですか？  
+~~え？知らない？バカだなぁ・・・~~  
+- risuto1  
+-- nest1
+
+$E = mc^2$
+
+$$
+\frac{n!}{k!(n-k)!} = \binom{n}{k}
+$$
+
+$x^2*y^2=xy^2$
+
+$√23^2$</textarea>
+            <div id="preview" class="preview"></div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import init, { markdown_to_html } from './pkg/md_editer.js';
+        
+        async function run() {
+            await init();
+            
+            const editor = document.getElementById('editor');
+            const preview = document.getElementById('preview');
+            
+            function updatePreview() {
+                const markdown = editor.value;
+                const html = markdown_to_html(markdown);
+                preview.innerHTML = html;
+                
+                if (window.MathJax) {
+                    MathJax.typesetPromise([preview])
+                        .then(() => {
+                            console.log('Math typeset completed');
+                            // 数式の表示を確認
+                            const mathElements = preview.querySelectorAll('.math-inline, .math-block');
+                            console.log('Math elements found:', mathElements.length);
+                        })
+                        .catch((err) => console.error('MathJax error:', err));
+                }
+            }
+            
+            editor.addEventListener('input', updatePreview);
+            updatePreview();
+        }
+        
+        run().catch(console.error);
+    </script>
+</body>
+</html> 
