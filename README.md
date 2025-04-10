@@ -2,6 +2,10 @@
 
 RustとWebAssemblyを使用した、数式や化学式、プログラミングコードに対応したMarkdownエディタです。
 
+## デモ
+
+[GitHub Pagesで公開されたデモ](https://[your-username].github.io/md-editer/)で実際に動作を確認できます。
+
 ## 機能
 
 ### 基本的なMarkdown記法
@@ -80,6 +84,13 @@ RustとWebAssemblyを使用した、数式や化学式、プログラミング�
    ```bash
    python -m http.server
    ```
+
+## GitHub Pagesへのデプロイ
+
+1. リポジトリの設定でGitHub Pagesを有効化
+   - Settings > Pages > Source: GitHub Actions
+2. メインブランチにプッシュすると自動的にデプロイ
+3. デプロイ後、`https://[your-username].github.io/md-editer/`でアクセス可能
 
 ## ライセンス
 

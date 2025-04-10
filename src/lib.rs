@@ -50,18 +50,18 @@ pub fn markdown_to_html(markdown: &str) -> String {
 fn process_math(html: &str) -> String {
     let mut result = html.to_string();
     
+    // ブロック数式の処理（先に処理する）
+    let block_math = Regex::new(r"\$\$([^$]+)\$\$").unwrap();
+    result = block_math.replace_all(&result, |caps: &regex::Captures| {
+        let math = &caps[1];
+        format!("<div class=\"math-block\">${}$</div>", math)
+    }).to_string();
+    
     // インライン数式の処理
     let inline_math = Regex::new(r"\$([^$]+)\$").unwrap();
     result = inline_math.replace_all(&result, |caps: &regex::Captures| {
         let math = &caps[1];
         format!("<span class=\"math-inline\">${}$</span>", math)
-    }).to_string();
-    
-    // ブロック数式の処理
-    let block_math = Regex::new(r"\$\$([^$]+)\$\$").unwrap();
-    result = block_math.replace_all(&result, |caps: &regex::Captures| {
-        let math = &caps[1];
-        format!("<div class=\"math-block\">$${}$$</div>", math)
     }).to_string();
     
     result

@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Markdown Editor</title>
-    <!-- MathJaxのスクリプト -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
         window.MathJax = {
             loader: {
-                load: ['[tex]/mhchem', '[tex]/physics', '[tex]/ams']
+                load: ['[tex]/mhchem', '[tex]/ams']
             },
             tex: {
                 inlineMath: [['$', '$']],
@@ -16,30 +22,22 @@
                 processEscapes: true,
                 processEnvironments: true,
                 packages: {
-                    '[+]': ['mhchem', 'physics', 'ams']
-                },
-                macros: {
-                    '\\unit': '\\mathrm{#1}'
+                    '[+]': ['mhchem', 'ams']
                 }
             },
             options: {
-                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-                ignoreHtmlClass: 'tex2jax_ignore',
-                processHtmlClass: 'tex2jax_process'
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+                ignoreHtmlClass: '.*',
+                processHtmlClass: 'math-inline|math-block'
             },
             startup: {
                 ready: () => {
                     MathJax.startup.defaultReady();
                     console.log('MathJax is ready');
                 }
-            },
-            chtml: {
-                scale: 1.1,
-                minScale: 0.5
             }
         };
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
     <style>
         :root {
             --editor-bg: #f8f9fa;
@@ -48,37 +46,77 @@
             --border-color: #dee2e6;
             --focus-color: #80bdff;
             --math-color: #2b5797;
+            --section-bg: #ffffff;
+            --section-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             line-height: 1.6;
             color: var(--text-color);
-            margin: 0;
-            padding: 20px;
             background-color: #f5f5f5;
+            padding: 20px;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            display: grid;
-            grid-template-rows: auto 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
         }
         
         .cheatsheet-section {
-            background-color: var(--preview-bg);
+            background-color: var(--section-bg);
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            box-shadow: var(--section-shadow);
+        }
+        
+        .cheatsheet-section h2 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .cheatsheet-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .cheatsheet-content h3 {
+            margin-bottom: 10px;
+            color: var(--math-color);
+        }
+        
+        .cheatsheet-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .cheatsheet-content li {
+            margin-bottom: 8px;
+        }
+        
+        .cheatsheet-content code {
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
         }
         
         .editor-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
+            min-height: 600px;
         }
         
         @media (max-width: 768px) {
@@ -87,21 +125,32 @@
             }
         }
         
-        .editor, .preview {
-            background-color: var(--preview-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+        .editor-section, .preview-section {
+            background-color: var(--section-bg);
             padding: 20px;
-            min-height: 500px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: var(--section-shadow);
+        }
+        
+        .editor-section h2, .preview-section h2 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .editor {
+            width: 100%;
+            height: calc(100% - 50px);
+            min-height: 500px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 16px;
             line-height: 1.5;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             resize: none;
             outline: none;
+            background-color: var(--editor-bg);
         }
         
         .editor:focus {
@@ -110,7 +159,13 @@
         }
         
         .preview {
+            height: calc(100% - 50px);
+            min-height: 500px;
             overflow-y: auto;
+            padding: 15px;
+            background-color: var(--preview-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
         }
         
         .preview h1 {
@@ -187,210 +242,187 @@
             margin: 1em 0;
             text-align: center;
         }
-        
-        .cheatsheet {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        
-        .cheatsheet h3 {
-            margin-top: 0;
-            color: var(--math-color);
-        }
-        
-        .cheatsheet code {
-            background-color: #e9ecef;
-            padding: 2px 4px;
-            border-radius: 3px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="cheatsheet-section">
-            <h2>Markdownチートシート</h2>
-            <div class="cheatsheet">
-                <h3>見出し</h3>
-                <code># 見出し1</code><br>
-                <code>## 見出し2</code><br>
-                <code>### 見出し3</code>
-                
-                <h3>テキスト</h3>
-                <code>**太字**</code><br>
-                <code>*イタリック*</code><br>
-                <code>~~取り消し線~~</code>
-                
-                <h3>リスト</h3>
-                <code>- リスト1</code><br>
-                <code>- リスト2</code><br>
-                <code>1. 番号付きリスト1</code><br>
-                <code>2. 番号付きリスト2</code>
-                
-                <h3>数式</h3>
-                <code>$E = mc^2$</code> (インライン)<br>
-                <code>$$\frac{n!}{k!(n-k)!} = \binom{n}{k}$$</code> (ブロック)
-                
-                <h3>化学式</h3>
-                <code>$\ce{H2O}$</code> (水)<br>
-                <code>$\ce{CO2 + C -> 2 CO}$</code> (化学反応式)<br>
-                <code>$\ce{CH4}$</code> (メタン)
-                
-                <h3>物理単位</h3>
-                <code>$\unit{kg\cdot m/s^2}$</code> (力)<br>
-                <code>$\unit{m/s}$</code> (速度)<br>
-                <code>$\unit{J}$</code> (エネルギー)
-                
-                <h3>行列</h3>
-                <code>$$\begin{pmatrix} a & b \\ c & d \end{pmatrix}$$</code> (2x2行列)<br>
-                <code>$$\begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}$$</code> (3x3行列)
-                
-                <h3>プログラミングコード</h3>
-                <code>```rust
-fn main() {
-    println!("Hello, World!");
-}
-```</code> (Rust)<br>
-                <code>```python
-def hello():
-    print("Hello, World!")
-```</code> (Python)<br>
-                <code>```javascript
-function hello() {
-    console.log("Hello, World!");
-}
-```</code> (JavaScript)<br>
-                <code>`console.log("Hello, World!");`</code> (インラインコード)
+            <h2>Markdown チートシート</h2>
+            <div class="cheatsheet-content">
+                <div>
+                    <h3>基本的な記法</h3>
+                    <ul>
+                        <li>見出し: <code># 見出し1</code>, <code>## 見出し2</code></li>
+                        <li>太字: <code>**太字**</code></li>
+                        <li>イタリック: <code>*イタリック*</code></li>
+                        <li>取り消し線: <code>~~取り消し線~~</code></li>
+                        <li>リスト: <code>- リスト</code></li>
+                        <li>番号付きリスト: <code>1. リスト</code></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3>数式</h3>
+                    <ul>
+                        <li>インライン数式: <code>$E = mc^2$</code></li>
+                        <li>ブロック数式: <code>$$ \frac{n!}{k!(n-k)!} $$</code></li>
+                    </ul>
+
+                    <h3>化学式</h3>
+                    <ul>
+                        <li>化学式: <code>$\ce{H2O}$</code></li>
+                        <li>化学反応式: <code>$\ce{CO2 + C -> 2 CO}$</code></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3>物理単位</h3>
+                    <ul>
+                        <li>力: <code>$\unit{kg\cdot m/s^2}$</code></li>
+                        <li>速度: <code>$\unit{m/s}$</code></li>
+                        <li>エネルギー: <code>$\unit{J}$</code></li>
+                    </ul>
+
+                    <h3>行列</h3>
+                    <ul>
+                        <li>2x2行列: <code>$$ \begin{pmatrix} a & b \\ c & d \end{pmatrix} $$</code></li>
+                        <li>3x3行列: <code>$$ \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix} $$</code></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3>プログラミングコード</h3>
+                    <ul>
+                        <li>コードブロック: <code>```rust fn main() { ... } ```</code></li>
+                        <li>インラインコード: <code>`console.log("Hello")`</code></li>
+                    </ul>
+                </div>
             </div>
         </div>
-        
+
         <div class="editor-container">
-            <textarea id="editor" class="editor" placeholder="Markdownを入力してください..."># これは見出し
-
-## ホタテの名前をつけよう
-**ホタテ**についてご存知ですか？  
-~~え？知らない？バカだなぁ・・・~~  
-- risuto1  
--- nest1
-
-$E = mc^2$
-
-$$
-\frac{n!}{k!(n-k)!} = \binom{n}{k}
-$$
-
-$x^2*y^2=xy^2$
-
-$√23^2$
-
-## 化学式の例
-$\ce{H2O}$ - 水  
-$\ce{CO2 + C -> 2 CO}$ - 化学反応式  
-$\ce{CH4}$ - メタン
-
-## 物理単位の例
-$\unit{kg\cdot m/s^2}$ - 力  
-$\unit{m/s}$ - 速度  
-$\unit{J}$ - エネルギー
-
-## 行列の例
-$$
-\begin{pmatrix} a & b \\ c & d \end{pmatrix}
-$$
-
-$$
-\begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}
-$$
-
-## プログラミングコードの例
-
-### Rust
-```rust
-fn main() {
-    println!("Hello, World!");
-}
-
-// 構造体の例
-struct Point {
-    x: f64,
-    y: f64,
-}
-
-// トレイトの例
-trait Drawable {
-    fn draw(&self);
-}
-```
-
-### Python
-```python
-def hello():
-    print("Hello, World!")
-
-# クラスの例
-class Person:
-    def __init__(self, name):
-        self.name = name
-    
-    def greet(self):
-        print(f"Hello, {self.name}!")
-```
-
-### JavaScript
-```javascript
-function hello() {
-    console.log("Hello, World!");
-}
-
-// クラスの例
-class Person {
-    constructor(name) {
-        this.name = name;
-    }
-    
-    greet() {
-        console.log(`Hello, ${this.name}!`);
-    }
-}
-```
-
-### インラインコード
-これは`console.log("Hello, World!");`のようなインラインコードの例です。</textarea>
-            <div id="preview" class="preview"></div>
+            <div class="editor-section">
+                <h2>エディタ</h2>
+                <textarea id="editor" class="editor"></textarea>
+            </div>
+            <div class="preview-section">
+                <h2>プレビュー</h2>
+                <div id="preview" class="preview"></div>
+            </div>
         </div>
     </div>
-    
+
     <script type="module">
         import init, { markdown_to_html } from './pkg/md_editer.js';
-        
+
         async function run() {
             await init();
             
             const editor = document.getElementById('editor');
             const preview = document.getElementById('preview');
             
+            // 初期コンテンツを設定
+            editor.value = `# Markdown エディタ
+
+## 基本的な記法
+- **太字**
+- *イタリック*
+- ~~取り消し線~~
+
+## 数式の例
+インライン数式: $E = mc^2$
+
+ブロック数式:
+$$
+\\frac{n!}{k!(n-k)!} = \\binom{n}{k}
+$$
+
+## 化学式の例
+水の化学式: $\\ce{H2O}$
+
+化学反応式: $\\ce{CO2 + C -> 2 CO}$
+
+メタンの燃焼: $\\ce{CH4 + 2 O2 -> CO2 + 2 H2O}$
+
+アンモニアの合成: $\\ce{N2 + 3 H2 <=> 2 NH3}$
+
+## 物理単位の例
+力: $\\unit{kg\\cdot m/s^2}$
+速度: $\\unit{m/s}$
+エネルギー: $\\unit{J}$
+
+## 行列の例
+2x2行列:
+$$
+\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}
+$$
+
+3x3行列:
+$$
+\\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{bmatrix}
+$$
+
+## プログラミングコードの例
+
+\`\`\`rust
+fn main() {
+    println!("Hello, World!");
+}
+
+struct Point {
+    x: f64,
+    y: f64,
+}
+
+trait Drawable {
+    fn draw(&self);
+}
+\`\`\`
+
+\`\`\`python
+def hello():
+    print("Hello, World!")
+
+class Person:
+    def __init__(self, name):
+        self.name = name
+\`\`\`
+
+\`\`\`javascript
+function hello() {
+    console.log("Hello, World!");
+}
+
+class Person {
+    constructor(name) {
+        this.name = name;
+    }
+}
+\`\`\`
+
+インラインコード: \`console.log("Hello, World!");\`
+`;
+
             function updatePreview() {
                 const markdown = editor.value;
                 const html = markdown_to_html(markdown);
                 preview.innerHTML = html;
                 
+                // コードブロックのシンタックスハイライト
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+                
+                // MathJaxの再レンダリング
                 if (window.MathJax) {
-                    MathJax.typesetPromise([preview])
-                        .then(() => {
-                            console.log('Math typeset completed');
-                            // 数式の表示を確認
-                            const mathElements = preview.querySelectorAll('.math-inline, .math-block');
-                            console.log('Math elements found:', mathElements.length);
-                        })
-                        .catch((err) => console.error('MathJax error:', err));
+                    window.MathJax.typesetPromise([preview]).catch((err) => console.error('MathJax error:', err));
                 }
             }
-            
+
             editor.addEventListener('input', updatePreview);
             updatePreview();
         }
-        
+
         run().catch(console.error);
     </script>
 </body>
