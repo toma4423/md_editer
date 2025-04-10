@@ -1,0 +1,19 @@
+{
+  "name": "md-editer",
+  "type": "module",
+  "collaborators": [
+    "Your Name <your.email@example.com>"
+  ],
+  "description": "A Markdown editor using Rust and WebAssembly",
+  "version": "0.1.0",
+  "files": [
+    "md_editer_bg.wasm",
+    "md_editer.js",
+    "md_editer.d.ts"
+  ],
+  "main": "md_editer.js",
+  "types": "md_editer.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
