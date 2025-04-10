@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       
       - name: Install Rust
         uses: actions-rs/toolchain@v1
@@ -21,6 +23,15 @@ jobs:
         
       - name: Build
         run: wasm-pack build --target web
+        
+      - name: Setup Pages
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git checkout -b gh-pages
+          git add -f pkg/
+          git commit -m "Initial commit for GitHub Pages"
+          git push -f origin gh-pages
         
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
