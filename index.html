@@ -7,13 +7,19 @@
     <!-- MathJaxのスクリプト -->
     <script>
         window.MathJax = {
+            loader: {
+                load: ['[tex]/mhchem', '[tex]/physics', '[tex]/ams']
+            },
             tex: {
                 inlineMath: [['$', '$']],
                 displayMath: [['$$', '$$']],
                 processEscapes: true,
                 processEnvironments: true,
                 packages: {
-                    '[+]': ['base', 'ams', 'noerrors', 'noundefined']
+                    '[+]': ['mhchem', 'physics', 'ams']
+                },
+                macros: {
+                    '\\unit': '\\mathrm{#1}'
                 }
             },
             options: {
@@ -225,6 +231,37 @@
                 <h3>数式</h3>
                 <code>$E = mc^2$</code> (インライン)<br>
                 <code>$$\frac{n!}{k!(n-k)!} = \binom{n}{k}$$</code> (ブロック)
+                
+                <h3>化学式</h3>
+                <code>$\ce{H2O}$</code> (水)<br>
+                <code>$\ce{CO2 + C -> 2 CO}$</code> (化学反応式)<br>
+                <code>$\ce{CH4}$</code> (メタン)
+                
+                <h3>物理単位</h3>
+                <code>$\unit{kg\cdot m/s^2}$</code> (力)<br>
+                <code>$\unit{m/s}$</code> (速度)<br>
+                <code>$\unit{J}$</code> (エネルギー)
+                
+                <h3>行列</h3>
+                <code>$$\begin{pmatrix} a & b \\ c & d \end{pmatrix}$$</code> (2x2行列)<br>
+                <code>$$\begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}$$</code> (3x3行列)
+                
+                <h3>プログラミングコード</h3>
+                <code>```rust
+fn main() {
+    println!("Hello, World!");
+}
+```</code> (Rust)<br>
+                <code>```python
+def hello():
+    print("Hello, World!")
+```</code> (Python)<br>
+                <code>```javascript
+function hello() {
+    console.log("Hello, World!");
+}
+```</code> (JavaScript)<br>
+                <code>`console.log("Hello, World!");`</code> (インラインコード)
             </div>
         </div>
         
@@ -245,7 +282,81 @@ $$
 
 $x^2*y^2=xy^2$
 
-$√23^2$</textarea>
+$√23^2$
+
+## 化学式の例
+$\ce{H2O}$ - 水  
+$\ce{CO2 + C -> 2 CO}$ - 化学反応式  
+$\ce{CH4}$ - メタン
+
+## 物理単位の例
+$\unit{kg\cdot m/s^2}$ - 力  
+$\unit{m/s}$ - 速度  
+$\unit{J}$ - エネルギー
+
+## 行列の例
+$$
+\begin{pmatrix} a & b \\ c & d \end{pmatrix}
+$$
+
+$$
+\begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}
+$$
+
+## プログラミングコードの例
+
+### Rust
+```rust
+fn main() {
+    println!("Hello, World!");
+}
+
+// 構造体の例
+struct Point {
+    x: f64,
+    y: f64,
+}
+
+// トレイトの例
+trait Drawable {
+    fn draw(&self);
+}
+```
+
+### Python
+```python
+def hello():
+    print("Hello, World!")
+
+# クラスの例
+class Person:
+    def __init__(self, name):
+        self.name = name
+    
+    def greet(self):
+        print(f"Hello, {self.name}!")
+```
+
+### JavaScript
+```javascript
+function hello() {
+    console.log("Hello, World!");
+}
+
+// クラスの例
+class Person {
+    constructor(name) {
+        this.name = name;
+    }
+    
+    greet() {
+        console.log(`Hello, ${this.name}!`);
+    }
+}
+```
+
+### インラインコード
+これは`console.log("Hello, World!");`のようなインラインコードの例です。</textarea>
             <div id="preview" class="preview"></div>
         </div>
     </div>
