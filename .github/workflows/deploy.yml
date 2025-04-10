@@ -29,21 +29,10 @@ jobs:
       - name: Build
         run: wasm-pack build --target web
         
-      - name: Setup Pages
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          git checkout --orphan gh-pages
-          git rm -rf .
-          git add -f pkg/
-          git commit -m "Initial commit for GitHub Pages"
-          git push -f origin gh-pages
-        
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./pkg
           publish_branch: gh-pages
-          force_orphan: true
           commit_message: "Deploy: ${{ github.event.head_commit.message }}" 
