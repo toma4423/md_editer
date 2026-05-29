@@ -42,29 +42,34 @@ pub fn markdown_to_html(markdown: &str) -> String {
     html
 }
 
+use std::sync::OnceLock;
+
+static BLOCK_MATH_RE: OnceLock<Regex> = OnceLock::new();
+static INLINE_MATH_RE: OnceLock<Regex> = OnceLock::new();
+
 /**
  * 数式を処理する関数
  * @param html - 処理対象のHTML文字列
  * @return 処理済みのHTML文字列
  */
 fn process_math(html: &str) -> String {
-    let mut result = html.to_string();
+    let block_math = BLOCK_MATH_RE.get_or_init(|| Regex::new(r"(?s)\$\$(.*?)\$\$").unwrap());
+    let inline_math = INLINE_MATH_RE.get_or_init(|| Regex::new(r"\$([^$]+?)\$").unwrap());
     
     // ブロック数式の処理（先に処理する）
-    let block_math = Regex::new(r"\$\$([^$]+)\$\$").unwrap();
-    result = block_math.replace_all(&result, |caps: &regex::Captures| {
+    // regex::replace_all returns Cow<str>, avoiding allocation if no match is found
+    let result = block_math.replace_all(html, |caps: &regex::Captures| {
         let math = &caps[1];
         format!("<div class=\"math-block\">${}$</div>", math)
-    }).to_string();
+    });
     
     // インライン数式の処理
-    let inline_math = Regex::new(r"\$([^$]+)\$").unwrap();
-    result = inline_math.replace_all(&result, |caps: &regex::Captures| {
+    let result = inline_math.replace_all(&result, |caps: &regex::Captures| {
         let math = &caps[1];
         format!("<span class=\"math-inline\">${}$</span>", math)
-    }).to_string();
+    });
     
-    result
+    result.into_owned()
 }
 
 /// テスト用の関数
